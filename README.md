@@ -1,53 +1,50 @@
-# Introduction
+# Dense neural networks in NumPy
 
-This project is devoted to making a neural network architecture with minimal library requirements in Python. For CPU only support, only the math package and NumPy will be used. For GPU support, I plan to use CuPy instead of NumPy (this requires a CUDA supported GPU).
+An educational implementation of fully connected neural networks,
+backpropagation, and gradient descent using NumPy. The code accompanies
+[Neural Networks: Overview](Neural%20Networks%3A%20Overview.pdf), a set of
+mathematical notes on neural networks.
 
-See the PDF labeled "Neural Networks: Overview" for the basics of neural networks, from a mathematical perspective.
+## Minimal example
 
-# DenseNetwork Class
-This class contains all dense neural network architectures. Each object in this class has the following ***attributes***:
+```bash
+git clone https://github.com/Hydrodynamical/neuralnetwork.git
+cd neuralnetwork
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install numpy
+```
 
-0. **init** 
-   -Initialization of a network has manditory input arch, which is a list of integers. Optional argument are sigma = 'arctan', d_sigma = 'd_arctan',  and rand_scale = 1. 
-1. **arch**
-   - A list of numbers describing the number of neurons per layer.
-2. **weight**
-   - A list of the weight matrices per layer.
-3. **bias**
-   - A list of the biase vectors per layer.
-4. **sigma**
-   - The non-linearity of the network. sigma = 'arctan' is default.
-5. **d_sigma**
-   - The derivative of sigma. d_sigma = 'd_arctan' is default.
-6. **z**
-   - The "response" of the network before applying sigma. This is useful to keep track of when we are computing the activation of the network.
-7. **grad_activation**
-   - The gradient of the loss with respect to the activations using the L2 loss. This is useful to keep track of when computing the gradient of the network. 
-8. **grad_weight**
-   - The gradient of the loss with respect to the weights using the L2 loss.
-9. **grad_bias** 
-   - The gradient of the loss with respect to the biases using the L2 loss.
-
-The ***methods*** for this class are the following:
-1. **evaluate**
-   - Evaluate network at a given input. TypeError is raised if dimension mismatch. Subfunction of gradient function below.
-2. **gradient**
-   - Update the gradients of the network given an input data and an expected output using the L2 loss.
-3. **do_GD**
-   - Update the weights and biases of the network using gradient decent, and a given step size. 
-4. **print_state**
-   - This is for debugging. Prints out the attributes of the network.
-   
-# Example Usage
-In any Python IDE, you can use the following commands to use the DenseNetwork class:
+From the repository root:
 
 ```python
-!git clone ...
 import numpy as np
-import math
-from neuralnetwork.NetworkArch import DenseNetwork
-network = DenseNetwork(arch = [10, 5, 1])
-input = np.random.randn(10)
-network.evaluate(input)
-network.print_state()
+from NetworkArch import DenseNetwork
+
+network = DenseNetwork(arch=[10, 5, 1])
+x = np.random.randn(10)
+prediction = network.evaluate(x)
+print(prediction)
 ```
+
+## Interface
+
+`DenseNetwork` takes a list of layer widths. Its default activation is a
+scaled arctangent; custom activation and derivative functions can also be
+passed to the constructor.
+
+| Method | Purpose |
+| --- | --- |
+| `evaluate(input_data)` | Evaluate the network and retain the intermediate activations |
+| `gradient(input_data, expected_output)` | Compute gradients for the squared-error loss |
+| `do_GD(step_size)` | Update weights and biases using the stored gradients |
+| `print_state()` | Print internal state for inspection |
+
+Weights, biases, activations, pre-activation values, and their gradients are
+stored on the network object. See [`NetworkArch.py`](NetworkArch.py) for the
+implementation.
+
+This is a small learning project. The implemented backend is NumPy; the
+commented CuPy import is an exploratory note, not GPU support.
+
+[License](LICENSE)
